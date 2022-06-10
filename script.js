@@ -72,7 +72,6 @@ if (localStorage.length !== 5) {
 }
 
 function draw(event) {
-  console.log('clicked');
   event.target.classList.remove('hover');
   if (currentLetter === 1) {
     event.target.innerText = "X";
