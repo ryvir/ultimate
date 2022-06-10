@@ -1,0 +1,99 @@
+:root {
+  --main-color: black;
+  --background-color: white;
+  --focus-color: #e5ffff;
+  --win-color: lightblue;
+}
+
+body {
+  color: var(--main-color);
+  background: var(--background-color);
+  font-family: Helvetica, Arial, serif;
+}
+
+.main {
+  display: grid;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+}
+
+.main > * {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+}
+
+.container {
+  margin: auto;
+  height: 300px;
+  width: 300px;
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  grid-template-rows: 100px 100px 100px;
+}
+
+.container:first-of-type {
+  z-index: 2;
+}
+
+.container:last-of-type {
+  z-index: 1;
+  color: var(--main-color);
+  font-weight: lighter;
+  line-height: 100px;
+  text-align: center;
+  font-size: 6em;
+}
+
+.big {
+  height: 100px;
+  width: 100px;
+  box-sizing: border-box;
+  border: 2px solid var(--main-color);
+  display: grid;
+  grid-template-columns: 30px 30px 30px;
+  grid-template-rows: 30px 30px 30px;
+  padding: 3px;
+}
+
+.square {
+  height: 30px;
+  width: 30px;
+  box-sizing: border-box;
+  border: 1px solid var(--main-color);
+  color: var(--main-color);
+  line-height: 30px;
+  text-align: center;
+  font-size: 1em;
+}
+
+.won {
+  background: var(--win-color);
+}
+
+.focused {
+  background: var(--focus-color);
+}
+
+p {
+  text-align: center;
+  font-size: 1em;
+}
+
+.hover {
+  color: gray;
+}
+
+@media all and (orientation: landscape) {
+  #turn {
+    display: none;
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  body {
+    --main-color: rgb(200, 200, 200);
+    --background-color: rgb(30, 30, 30);
+    --focus-color: rgb(52, 52, 146);
+    --win-color: darkblue;
+  }
+}
