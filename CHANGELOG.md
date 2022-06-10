@@ -1,5 +1,11 @@
 # Version History
 
+## 2.5.1
+
+## 2.5
+- Shift grid down to 40%.
+- Fix bug where O shows up on first turn.
+
 ## 2.4
 - Add a dark mode.
 - Change color mode based on system settings.

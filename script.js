@@ -1,5 +1,9 @@
 var turn = document.querySelector('#turn');
-turn.innerText += currentLetter === 1 ? " X" : " O";
+if (currentLetter) {
+  turn.innerText += currentLetter === 1 ? " X" : " O";
+} else {
+  turn.innerText += " X"
+}
 
 document.onkeyup = remove;
 
