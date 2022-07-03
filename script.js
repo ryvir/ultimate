@@ -5,10 +5,8 @@ if (currentLetter) {
   turn.innerText += " X"
 }
 
-document.onkeyup = remove;
-
-function remove(e) {
-  if (e.keyCode === 220) {
+document.onkeyup = e => {
+  if (e.key === "\\") {
     localStorage.clear();
   }
 }
