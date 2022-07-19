@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Ultimate Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script defer src="script-mp.js"></script>
+</head>
+
+<body>
+  <div class="main">
+    <div class="container">
+      <div id="big1" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big2" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big3" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big4" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big5" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big6" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big7" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big8" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+      <div id="big9" class="big">
+        <div id="small1" class="square"></div>
+        <div id="small2" class="square"></div>
+        <div id="small3" class="square"></div>
+        <div id="small4" class="square"></div>
+        <div id="small5" class="square"></div>
+        <div id="small6" class="square"></div>
+        <div id="small7" class="square"></div>
+        <div id="small8" class="square"></div>
+        <div id="small9" class="square"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+      <div class="overlay"></div>
+    </div>
+    <div id="code">Enter code: <input id="code-input" type="text"><button onclick="startGame()">Submit</button></div>
+  </div>
+  <p id="turn"> turn.</p>
+</body>
+
+</html>

@@ -1,6 +1,13 @@
 # Version History
 
-## 2.5.1
+## 3.0
+- Add multidevice functionality.
+- Store data in Firebase.
+- Create new files for multiplayer and singleplayer.
+- Create home page.
+
+## 2.6
+- Clean up UI.
 
 ## 2.5
 - Shift grid down to 40%.
