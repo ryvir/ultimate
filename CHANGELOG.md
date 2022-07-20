@@ -1,5 +1,9 @@
 # Version History
 
+# 3.1
+- Separate create and enter code.
+- Rename "player" to "device".
+
 ## 3.0
 - Add multidevice functionality.
 - Store data in Firebase.

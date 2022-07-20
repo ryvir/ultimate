@@ -36,6 +36,14 @@ body {
   z-index: 2;
 }
 
+#new-code {
+  cursor: pointer;
+  margin: 10px auto;
+  padding: 5px;
+  width:fit-content;
+  border: 1px solid black;
+}
+
 .container {
   display: grid;
   grid-template-columns: 100px 100px 100px;

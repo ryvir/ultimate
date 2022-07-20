@@ -7,7 +7,10 @@
   <title>Ultimate Tic Tac Toe</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <script src="script-sp.js" defer></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script defer src="script-md.js"></script>
 </head>
 
 <body>
@@ -124,8 +127,13 @@
       <div class="overlay"></div>
       <div class="overlay"></div>
     </div>
+    <div id="code">
+      Enter code: <input id="code-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off"><button onclick="startGame()">Submit</button>
+      <div><br>OR</div>
+      <div id="new-code" onclick="startGame()">Create new code</div>
+    </div>
   </div>
-  <p id="turn">Turn: </p>
+  <p id="turn"> turn.</p>
 </body>
 
 </html>
