@@ -1,8 +1,16 @@
 # Version History
 
+# 3.2
+- Add functionality to remove empty games from Firebase.
+- Add functionality to join back to a multiplayer game.
+- Fix bug where the same multiplayer code could be generated again.
+- Fix bug where a third player is allowed in multiplayer.
+- Remove local storage in multiplayer.
+- Add "enter" keybind in multiplayer.
+
 # 3.1
-- Separate create and enter code.
-- Rename "player" to "device".
+- Separate create and enter code for multiplayer.
+- Rename multiplayer "player" to "device".
 
 ## 3.0
 - Add multidevice functionality.

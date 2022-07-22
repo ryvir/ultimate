@@ -11,23 +11,39 @@ firebase.initializeApp({
 
 var playerId, playerRef, gameRef, playerLetter, currentLetter, board, metaBoard, squareOver, goal, gameOver, squares, overlay, thisId, boardRef, turn, players;
 
-function makeCode() {
-  var code = "";
-  var characters = "abcdefghijklmnopqrstuvwxyz";
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    code += characters.charAt(Math.floor(Math.random() * 
-  charactersLength));
+document.onkeyup = e => {
+  if (e.key === "Enter") {
+    document.onkeyup = null;
+    startGame();
   }
-  return code;
+}
+
+function checkPlayerNumber(s) {
+  var result = 1;
+  s.forEach(child => {
+    if (child.val().letter == 1) {
+      result = 2;
+    }
+  })
+  return result;
 }
 
 function startGame() {
-  localStorage.clear();
-  let codeInput = document.querySelector('#code-input');
+  var codeInput = document.querySelector('#code-input');
   var code, newCode;
   if (codeInput.value) {
     code = codeInput.value.toLowerCase();
+    if (!(code.length == 4)) {
+      codeInput.value = "";
+      codeInput.placeholder = "Must have 4 letters."
+      document.onkeyup = e => {
+        if (e.key === "Enter") {
+          document.onkeyup = null;
+          startGame();
+        }
+      }
+      return;
+    }
     newCode = false;
   } else {
     code = String.fromCharCode(97+Math.floor(Math.random() * 26), 97+Math.floor(Math.random() * 26), 97+Math.floor(Math.random() * 26), 97+Math.floor(Math.random() * 26));
@@ -35,20 +51,24 @@ function startGame() {
   }
   firebase.auth().signInAnonymously();
   firebase.auth().onAuthStateChanged(user => {
+    let i = 0;
+    firebase.database().ref('games').once('value', snapshot => {
+      snapshot.forEach(game => {
+        if (!game.val().players) {
+          firebase.database().ref(`games/${game.key}`).remove();
+        } else {
+          if (game.key === code && newCode === true) i++;
+        }
+      })
+    })
+    if (i === 2) startGame();
+
     playerId = user.uid;
     playerRef = firebase.database().ref(`games/${code}/players/${playerId}`);
     gameRef = firebase.database().ref(`games/${code}`);
     boardRef = firebase.database().ref(`games/${code}/board`);
     players = firebase.database().ref(`games/${code}/players`);
-    boardRef.set({
-      currentLetter: 1,
-      metaBoard: "0,0,0,0,0,0,0,0,0,0",
-      board: "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-      goal: 1,
-      thisId: 1,
-      gameOver: false
-    })
-    
+
     playerRef.set({
       id: playerId
     })
@@ -56,9 +76,14 @@ function startGame() {
     playerRef.onDisconnect().remove();
 
     players.once("value").then(snapshot => {
-      if (snapshot.numChildren() == 2) {
-        playerRef.update({ letter: 2 });
-        playerLetter = 2;
+      if (snapshot.numChildren() === 3) {
+        codeInput.value = "";
+        codeInput.placeholder = "Game is full."
+        firebase.database().ref(`games/${code}/players/${playerId}`).remove();
+        return;
+      } else if (snapshot.numChildren() == 2) {
+        playerRef.update({ letter: checkPlayerNumber(snapshot) });
+        playerLetter = checkPlayerNumber(snapshot);
         document.querySelector("#code").remove();
         turn = document.querySelector('#turn');
         turn.innerText = "Opponent's " + turn.innerText;
@@ -67,47 +92,59 @@ function startGame() {
         }
         setUp();
         boardRef.on("value", snap => {
-          if (snap.val().currentLetter == playerLetter) {
-            currentLetter = snap.val().currentLetter;
-            board = snap.val().board.split(',');
-            for (var i = 0; i < board.length; i++) {
-              board[i] = parseInt(board[i]);
-            }
-            var temp = [];
-            var innerTemp = [];
-            for (var i = 0; i < 10; i++) {
-              for (var j = 0; j < 10; j++) {
-                innerTemp.push(board[0]);
-                board.shift();
-              }
-              temp.push(innerTemp);
-              innerTemp = [];
-            }
-            board = [...temp];
-            metaBoard = snap.val().metaBoard.split(',');
-            for (var i = 0; i < metaBoard.length; i++) {
-              metaBoard[i] = parseInt(metaBoard[i]);
-            }
-            goal = parseInt(snap.val().goal);
-            thisId = parseInt(snap.val().thisId);
-            squares = Array.from(document.querySelectorAll('.square'));
-            overlay = Array.from(document.querySelectorAll('.overlay'));
-            restore();
+          currentLetter = snap.val().currentLetter;
+          board = snap.val().board.split(',');
+          for (var i = 0; i < board.length; i++) {
+            board[i] = parseInt(board[i]);
           }
+          var temp = [];
+          var innerTemp = [];
+          for (var i = 0; i < 10; i++) {
+            for (var j = 0; j < 10; j++) {
+              innerTemp.push(board[0]);
+              board.shift();
+            }
+            temp.push(innerTemp);
+            innerTemp = [];
+          }
+          board = [...temp];
+          metaBoard = snap.val().metaBoard.split(',');
+          for (var i = 0; i < metaBoard.length; i++) {
+            metaBoard[i] = parseInt(metaBoard[i]);
+          }
+          goal = parseInt(snap.val().goal);
+          thisId = parseInt(snap.val().thisId);
+          squares = Array.from(document.querySelectorAll('.square'));
+          overlay = Array.from(document.querySelectorAll('.overlay'));
+          restore(snap.val().currentLetter == playerLetter);
         })
       } else {
-        if (!newCode) {
+        if (!newCode && snapshot.numChildren() !== 3) {
           codeInput.value = "";
           codeInput.placeholder = "Code does not exist."
           gameRef.remove();
+          document.onkeyup = e => {
+            if (e.key === "Enter") {
+              document.onkeyup = null;
+              startGame();
+            }
+          }
           return;
         }
         playerRef.update({ letter: 1 });
         playerLetter = 1;
-        document.querySelector("#code").innerText = `Waiting for another player...\n\nCode: ${code}`;
+        boardRef.set({
+          currentLetter: 1,
+          metaBoard: "0,0,0,0,0,0,0,0,0,0",
+          board: "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+          goal: 1,
+          thisId: 1,
+          gameOver: false
+        })
+        document.querySelector("#code").innerText = `Code: ${code}\n\nWaiting for another player...`;
         players.on("child_added", (snapshot) => {
           if (snapshot.val().id != playerId) {
-            document.querySelector("#code").remove();
+            if (document.querySelector("#code")) document.querySelector("#code").remove();
             turn = document.querySelector('#turn');
             turn.innerText = "Your " + turn.innerText;
             if (window.innerWidth < window.innerHeight) {
@@ -155,39 +192,9 @@ function startGame() {
 }
 
 function setUp() {
-  if (localStorage.length < 5) {
-    currentLetter = 1; // 0 is empty, 1 is X, 2 is O
-    board = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // blank
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ];
-    metaBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    squareOver = false;
-    goal = 1;
-    gameOver = false;
-    
-    squares = Array.from(document.querySelectorAll('.square'));
-    for (var i = 0; i < squares.length; i++) {
-      if (playerLetter == 1) {
-        squares[i].addEventListener('click', draw);
-        squares[i].addEventListener('mouseover', hover);
-        squares[i].addEventListener('mouseout', unHover);
-      }
-    }
-    
-    overlay = Array.from(document.querySelectorAll('.overlay'));
-  
-  } else {
-    currentLetter = parseInt(localStorage.currentLetter);
-    board = localStorage.board.split(',');
+  boardRef.once('value', snapshot => {
+    currentLetter = snapshot.val().currentLetter;
+    board = snapshot.val().board.split(',');
     for (var i = 0; i < board.length; i++) {
       board[i] = parseInt(board[i]);
     }
@@ -202,16 +209,24 @@ function setUp() {
       innerTemp = [];
     }
     board = [...temp];
-    metaBoard = localStorage.metaBoard.split(',');
+    metaBoard = snapshot.val().metaBoard.split(',');
     for (var i = 0; i < metaBoard.length; i++) {
       metaBoard[i] = parseInt(metaBoard[i]);
     }
-    goal = parseInt(localStorage.goal);
-    thisId = parseInt(localStorage.thisId);
+    goal = parseInt(snapshot.val().goal);
+    thisId = parseInt(snapshot.val().thisId);
     squares = Array.from(document.querySelectorAll('.square'));
+    if (playerLetter == currentLetter) {
+      for (var i = 0; i < squares.length; i++) {
+        squares[i].addEventListener('click', draw);
+        squares[i].addEventListener('mouseover', hover);
+        squares[i].addEventListener('mouseout', unHover);
+      }
+    }
+    
     overlay = Array.from(document.querySelectorAll('.overlay'));
-    restore();
-  }
+  })
+  
 }
 
 function draw(event) {
@@ -241,7 +256,6 @@ function draw(event) {
       index.classList.remove('focused');
     })
     turn.style.display = 'none';
-    localStorage.clear();
     boardRef.update({
       currentLetter: currentLetter === 1 ? 2 : 1,
       metaBoard: metaBoard.toString(),
@@ -267,17 +281,7 @@ function draw(event) {
     index.removeEventListener('mouseout', unHover);
   })
 
-  if (turn.innerText === "Your turn.") {
-    turn.innerText = "Opponent's turn.";
-  } else {
-    turn.innerText = "Your turn."
-  }
-
-  localStorage.thisId = thisId;
-  localStorage.currentLetter = currentLetter;
-  localStorage.board = board.toString();
-  localStorage.metaBoard = metaBoard.toString();
-  localStorage.goal = goal;
+  turn.innerText = "Opponent's turn.";
 
   boardRef.update({
     currentLetter: currentLetter,
@@ -542,7 +546,7 @@ function restoreWinner(thisBoard) {
   return false;
 }
 
-function restore() {
+function restore(turn=true) {
   for (var i = 0; i < squares.length; i++) {
     if (board[Math.floor(i / 9) + 1][(i % 9) + 1] === 1) {
       squares[i].innerText = "X";
@@ -561,30 +565,31 @@ function restore() {
   }
   if (metaWinner()) {
     turn.style.display = 'none';
-    localStorage.clear();
     return;
   }
-  turn.innerText = "Your turn.";
-  if (overlay[thisId - 1].innerText === "" && !(board[thisId].slice(1).every(value => value !== 0))) {
-    overlay[thisId - 1].classList.add('focused');
-    for (var i = (9 * (thisId - 1)); i < (9 * thisId); i++) {
-      if (!(squares[i].innerText === "X" || squares[i].innerText === "O")) {
-        squares[i].addEventListener('click', draw);
-        squares[i].addEventListener('mouseover', hover);
-        squares[i].addEventListener('mouseout', unHover);
+  if (turn) {
+    document.querySelector("#turn").innerText = "Your turn.";
+    if (overlay[thisId - 1].innerText === "" && !(board[thisId].slice(1).every(value => value !== 0))) {
+      overlay[thisId - 1].classList.add('focused');
+      for (var i = (9 * (thisId - 1)); i < (9 * thisId); i++) {
+        if (!(squares[i].innerText === "X" || squares[i].innerText === "O")) {
+          squares[i].addEventListener('click', draw);
+          squares[i].addEventListener('mouseover', hover);
+          squares[i].addEventListener('mouseout', unHover);
+        }
       }
-    }
-  } else {
-    for (var i = 0; i < 81; i++) {
-      if (!(overlay[Math.floor(i / 9)].innerText === "X" || overlay[Math.floor(i / 9)].innerText === "O") && !(board[Math.floor(i / 9) + 1].slice(1).every(value => value !== 0)) && squares[i].innerText === "") {
-        squares[i].addEventListener('click', draw);
-        squares[i].addEventListener('mouseover', hover);
-        squares[i].addEventListener('mouseout', unHover);
-      } 
-    }
-    for (var i = 0; i < 9; i++) {
-      if (overlay[i].innerText === "" && !(board[i + 1].slice(1).every(value => value !== 0))) {
-        overlay[i].classList.add('focused');
+    } else {
+      for (var i = 0; i < 81; i++) {
+        if (!(overlay[Math.floor(i / 9)].innerText === "X" || overlay[Math.floor(i / 9)].innerText === "O") && !(board[Math.floor(i / 9) + 1].slice(1).every(value => value !== 0)) && squares[i].innerText === "") {
+          squares[i].addEventListener('click', draw);
+          squares[i].addEventListener('mouseover', hover);
+          squares[i].addEventListener('mouseout', unHover);
+        } 
+      }
+      for (var i = 0; i < 9; i++) {
+        if (overlay[i].innerText === "" && !(board[i + 1].slice(1).every(value => value !== 0))) {
+          overlay[i].classList.add('focused');
+        }
       }
     }
   }
